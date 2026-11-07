@@ -1,33 +1,25 @@
-import { useState } from 'react';
+{
+  /*
+   src/App.tsx
+*/
+}
+import BookList from './components/BookList';
+import SearchForm from './components/SearchForm';
+import { useAppSelector } from './hooks/store';
 
-import viteLogo from '../public/vite.svg';
-import reactLogo from './assets/react.svg';
+import type { ReactElement } from 'react';
 
-import './App.css';
-
-function App(): React.JSX.Element {
-  const [count, setCount] = useState(0);
+export default function App(): ReactElement {
+  const status = useAppSelector((state) => state.search.loadingStatus);
+  const error = useAppSelector((state) => state.search.error);
 
   return (
-    <>
-      <div>
-        <a href='https://vite.dev' target='_blank' rel='noreferrer'>
-          <img src={viteLogo} className='logo' alt='Vite logo' />
-        </a>
-        <a href='https://react.dev' target='_blank' rel='noreferrer'>
-          <img src={reactLogo} className='logo react' alt='React logo' />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className='card'>
-        <button onClick={() => setCount((count) => count + 1)}>count is {count}</button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className='read-the-docs'>Click on the Vite and React logos to learn more</p>
-    </>
+    <div>
+      <h1>Books</h1>
+      <SearchForm />
+      <p>Статус: {status}</p>
+      {status === 'failed' && <div className='error-message'>{error}</div>}
+      <BookList />
+    </div>
   );
 }
-
-export default App;

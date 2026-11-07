@@ -26,8 +26,10 @@
     "**/*.{json,html,md}": "prettier --write"
   },
   "dependencies": {
+    "@reduxjs/toolkit": "^2.14.0",
     "react": "^19.1.1",
-    "react-dom": "^19.1.1"
+    "react-dom": "^19.1.1",
+    "react-redux": "^9.3.1"
   },
   "devDependencies": {
     "@eslint/js": "^9.36.0",
@@ -50,6 +52,7 @@
     "husky": "^9.1.7",
     "lint-staged": "^16.2.3",
     "prettier": "^3.6.2",
+    "sass": "^1.108.0",
     "stylelint": "^16.24.0",
     "stylelint-config-standard": "^39.0.0",
     "stylelint-order": "^7.0.0",

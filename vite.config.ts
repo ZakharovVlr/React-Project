@@ -24,5 +24,12 @@ export default defineConfig({
   ], 
   server: {
     open: true,
+    proxy: {
+      '/api-books': {
+        target: 'https://gutendex.com',
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/api-books/, ''),
+      },
+    },
   },
 }); 
