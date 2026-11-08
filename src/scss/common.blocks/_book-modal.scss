@@ -1,0 +1,143 @@
+.book-modal-backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.75); // Затемнение фона
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 999;
+    padding: 20px;
+}
+
+.book-modal {
+    background: var(--color-surface, #1e1e1e); // Темная тема
+    color: var(--color-text, #fff);
+    width: 100%;
+    max-width: 800px;
+    border-radius: 20px;
+    padding: 32px;
+    position: relative;
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5);
+
+    &__close {
+        position: absolute;
+        top: 20px;
+        right: 20px;
+        background: transparent;
+        border: none;
+        color: inherit;
+        font-size: 20px;
+        cursor: pointer;
+        opacity: 0.6;
+
+        &:hover {
+            opacity: 1;
+        }
+    }
+
+    &__container {
+        display: flex;
+        gap: 32px;
+
+        @media (max-width: 600px) {
+            flex-direction: column;
+        }
+    }
+
+    &__left {
+        flex-shrink: 0;
+        width: 200px;
+
+        @media (max-width: 600px) {
+            width: 100%;
+            display: flex;
+            justify-content: center;
+        }
+    }
+
+    &__cover-wrapper {
+        width: 100%;
+        max-width: 200px;
+        aspect-ratio: 2 / 3;
+        border-radius: 8px;
+        overflow: hidden;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    }
+
+    &__cover {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    &__right {
+        flex-grow: 1;
+    }
+
+    &__type-tag {
+        font-size: 12px;
+        opacity: 0.5;
+        text-transform: uppercase;
+    }
+
+    &__title {
+        font-size: 26px;
+        margin: 8px 0;
+    }
+
+    &__author {
+        font-size: 16px;
+        opacity: 0.7;
+        margin-bottom: 20px;
+    }
+
+    &__actions {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        margin-bottom: 24px;
+    }
+
+    &__btn-read {
+        background: var(--color-accent, #fff);
+        color: #000;
+        padding: 10px 24px;
+        border-radius: 100px;
+        text-decoration: none;
+        font-weight: 600;
+        font-size: 15px;
+
+        &:hover {
+            opacity: 0.9;
+        }
+    }
+
+    &__downloads {
+        font-size: 14px;
+        opacity: 0.5;
+    }
+
+    &__details {
+        border-top: 1px solid rgba(255, 255, 255, 0.1);
+        padding-top: 16px;
+
+        h3 {
+            margin-bottom: 8px;
+            font-size: 16px;
+        }
+
+        p {
+            opacity: 0.8;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+    }
+
+    &__meta-item {
+        margin-top: 12px;
+        font-size: 14px;
+    }
+}

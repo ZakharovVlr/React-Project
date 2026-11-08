@@ -1,0 +1,68 @@
+.book-section {
+    margin-bottom: 48px;
+    width: 100%;
+
+    &__header {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 20px;
+        cursor: pointer;
+
+        &:hover {
+
+            .book-section__title,
+            .book-section__arrow {
+                color: var(--color-accent); // Текст подсветится при наведении
+            }
+        }
+    }
+
+    &__title {
+        font-size: 22px;
+        font-weight: 700;
+        color: var(--color-text);
+        margin: 0;
+    }
+
+    &__arrow {
+        font-size: 26px;
+        color: var(--color-text);
+        opacity: 0.6;
+        line-height: 1;
+    }
+
+    // Самая главная обертка для горизонтальной ленты
+    &__row {
+        display: flex;
+        flex-wrap: nowrap; // Запрещаем перенос карточек на новую строку
+        gap: 20px;
+        overflow-x: auto; // Включаем горизонтальный скролл
+        padding-bottom: 12px; // Место для красивого скроллбара
+        width: 100%;
+
+        // Скрываем дефолтный некрасивый скроллбар в некоторых браузерах
+        &::-webkit-scrollbar {
+            height: 6px;
+        }
+
+        &::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        &::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+
+            &:hover {
+                background: rgba(255, 255, 255, 0.2);
+            }
+        }
+    }
+
+    // Фиксируем ширину ячейки, чтобы карточки не сжимались внутри флекса
+    &__cell {
+        flex: 0 0 200px; // Карточка всегда будет строго 200px в ширину
+        width: 200px;
+    }
+}

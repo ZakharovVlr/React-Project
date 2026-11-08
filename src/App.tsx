@@ -4,6 +4,10 @@
 */
 }
 import BookList from './components/BookList';
+import BookModal from './components/BookModal';
+import CategoryList from './components/CategoryList';
+import Header from './components/Header';
+import Loader from './components/Loader';
 import SearchForm from './components/SearchForm';
 import { useAppSelector } from './hooks/store';
 
@@ -14,12 +18,16 @@ export default function App(): ReactElement {
   const error = useAppSelector((state) => state.search.error);
 
   return (
-    <div>
-      <h1>Books</h1>
-      <SearchForm />
-      <p>Статус: {status}</p>
-      {status === 'failed' && <div className='error-message'>{error}</div>}
-      <BookList />
+    <div className='page'>
+      <Header />
+      <main className='page__content'>
+        <SearchForm />
+        <CategoryList />
+        {status === 'loading' && <Loader />}
+        {status === 'failed' && <div className='error-message'>{error}</div>}
+        <BookList />
+      </main>
+      <BookModal />
     </div>
   );
 }
