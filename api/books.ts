@@ -21,7 +21,12 @@ export default async function handler(
   if (typeof languages === 'string') params.append('languages', languages);
 
   try {
-    const response = await fetch(`https://gutendex.com/books/?${params.toString()}`);
+    const response = await fetch(`https://gutendex.com/books/?${params.toString()}`, {
+      headers: {
+        'User-Agent':
+          'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36',
+      },
+    });
 
     if (!response.ok) {
       res.status(response.status).json({ error: 'Gutendex ответил ошибкой' });
