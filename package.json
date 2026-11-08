@@ -1,4 +1,7 @@
 {
+  "overrides": {
+    "minimatch": "^11.0.3"
+  },
   "name": "my-react-app",
   "private": true,
   "version": "0.0.0",
@@ -69,5 +72,10 @@
     "commitizen": {
       "path": "./node_modules/cz-conventional-changelog"
     }
+  },
+  "allowScripts": {
+    "esbuild@0.28.2": true,
+    "@parcel/watcher@2.6.0": true,
+    "fsevents@2.3.3": true
   }
 }

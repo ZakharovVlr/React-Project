@@ -36,7 +36,8 @@ export const fetchBooks = createAsyncThunk<APIResponse, void, { rejectValue: str
       if (lang) params.append('languages', lang);
 
       // Делаем реальный fetch на базовый адрес Gutendex API
-      const response = await fetch(`/api/books?${params.toString()}`);
+      const baseUrl = import.meta.env.VITE_GUTENDEX_URL ?? 'http://localhost:8000';
+      const response = await fetch(`${baseUrl}/books/?${params.toString()}`);
 
       if (!response.ok) {
         return thunkAPI.rejectWithValue('Не удалось загрузить книги с сервера');
