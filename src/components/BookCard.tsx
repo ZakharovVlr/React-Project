@@ -1,3 +1,8 @@
+{
+  /*
+   src/components/BookCard.tsx
+*/
+}
 import { useState, type ReactElement } from 'react';
 
 import { useAppDispatch } from '../hooks/store';

@@ -42,7 +42,9 @@ export const fetchBooks = createAsyncThunk<APIResponse, void, { rejectValue: str
       if (topic) params.append('topic', topic);
 
       const baseUrl = import.meta.env.VITE_GUTENDEX_URL ?? 'http://localhost:8000';
-      const response = await fetch(`${baseUrl}/books/?${params.toString()}`);
+      const response = await fetch(`${baseUrl}/books/?${params.toString()}`, {
+        signal: thunkAPI.signal,
+      });
 
       if (!response.ok) {
         return thunkAPI.rejectWithValue('Не удалось загрузить книги с сервера');
@@ -50,7 +52,10 @@ export const fetchBooks = createAsyncThunk<APIResponse, void, { rejectValue: str
 
       const data = (await response.json()) as APIResponse;
       return data;
-    } catch (_error) {
+    } catch (error) {
+      if (error instanceof DOMException && error.name === 'AbortError') {
+        throw error;
+      }
       return thunkAPI.rejectWithValue('Сбой сети, сервер недоступен');
     }
   }
@@ -120,6 +125,7 @@ export const bookSlice = createSlice({
         state.books = action.payload.results;
       })
       .addCase(fetchBooks.rejected, (state, action) => {
+        if (action.meta.aborted) return;
         state.loadingStatus = 'failed';
         state.error = action.payload ?? 'Произошла неизвестная ошибка';
       });

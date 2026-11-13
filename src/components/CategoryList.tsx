@@ -1,5 +1,10 @@
+{
+  /*
+   src/components/CategoryList.tsx
+*/
+}
 import { useAppDispatch, useAppSelector } from '../hooks/store';
-import { setTopic, fetchBooks } from '../store/SearchSlice';
+import { setTopic } from '../store/SearchSlice';
 
 import type { ReactElement } from 'react';
 
@@ -29,9 +34,7 @@ export default function CategoryList(): ReactElement {
   const activeTopic = useAppSelector((state) => state.search.topic);
 
   const handleClick = (topic: string): void => {
-    // Повторный клик по уже выбранной категории снимает фильтр
     dispatch(setTopic(activeTopic === topic ? '' : topic));
-    void dispatch(fetchBooks());
   };
 
   return (

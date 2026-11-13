@@ -1,3 +1,8 @@
+{
+  /*
+   src/components/BookModal.tsx
+*/
+}
 import { useAppSelector, useAppDispatch } from '../hooks/store';
 import { setActiveBook } from '../store/SearchSlice';
 

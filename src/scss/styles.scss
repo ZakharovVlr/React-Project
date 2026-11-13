@@ -1,23 +1,30 @@
-@use 'common.blocks/header';
-@use 'common.blocks/search-bar';
-@use 'common.blocks/category-list';
-@use 'common.blocks/loader'; 
-@use 'common.blocks/books-list';
-@use 'common.blocks/book-rows';
+//src/scss/styles.scss
+@use 'fonts';
+@use 'common.blocks/_header';
+@use 'common.blocks/_search-bar';
+@use 'common.blocks/_category-list';
+@use 'common.blocks/_category-showcase';
+@use 'common.blocks/_loader'; 
+@use 'common.blocks/_books-list';
+@use 'common.blocks/_book-rows';
 @use 'common.blocks/_book-modal';
 
 :root {
-    --color-bg: #1a1a1a;
+    --color-bg: #1e1d1d;
     --color-surface: #2a2a2a;
     --color-text: #ffffff;
     --color-text-muted: #9a9a9a;
     --color-accent: #0579f5;
-    --color-border: #3a3a3a;
+    --color-border: #737373;
+    --font-serif: 'Noto Serif', Georgia, serif;
+    --font-display: 'EB Garamond', Georgia, serif;
+    --font-pixel: 'Bitcount Single', monospace;
 }
 
 body {
     background: var(--color-bg);
     color: var(--color-text);
+    font-family: var(--font-serif);
     margin: 0;
 }
 

@@ -1,5 +1,6 @@
 .category-list {
     margin-top: 40px;
+    font-family: var(--font-serif);
 
     &__title {
         font-size: 28px;
@@ -10,26 +11,23 @@
     &__items {
         display: flex;
         flex-wrap: wrap;
-        gap: 12px;
+        gap: 10px;
     }
 
     &__item {
-        padding: 10px 20px;
+        font-family: var(--font-serif);
+        padding: 5px 15px;
         border: 1px solid var(--color-border);
         border-radius: 100px;
         background: transparent;
         color: var(--color-text);
-        font-size: 15px;
+        border-color: var(--color-text);
+        font-size: 13px;
         cursor: pointer;
         transition: border-color 0.2s, color 0.2s;
 
         &:hover {
-            border-color: var(--color-text);
-        }
-
-        &--active {
-            border-color: var(--color-accent);
-            color: var(--color-accent);
+            border-color: var(--color-border);
         }
     }
 }
