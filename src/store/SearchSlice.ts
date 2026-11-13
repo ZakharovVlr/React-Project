@@ -41,7 +41,8 @@ export const fetchBooks = createAsyncThunk<APIResponse, void, { rejectValue: str
       if (lang) params.append('languages', lang);
       if (topic) params.append('topic', topic);
 
-      const baseUrl = import.meta.env.VITE_GUTENDEX_URL ?? 'http://localhost:8000';
+      const baseUrl =
+        import.meta.env.VITE_GUTENDEX_URL ?? 'https://gutendex-tqvo.onrender.com/';
       const response = await fetch(`${baseUrl}/books/?${params.toString()}`, {
         signal: thunkAPI.signal,
       });
