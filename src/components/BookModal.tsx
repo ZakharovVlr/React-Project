@@ -3,7 +3,8 @@
    src/components/BookModal.tsx
 */
 }
-import { useState, useEffect } from 'react';
+
+import { useState } from 'react';
 import { FaBookOpen } from 'react-icons/fa';
 
 import { useAppSelector, useAppDispatch } from '../hooks/store';
@@ -19,54 +20,46 @@ function formatAuthorName(name: string): string {
 export default function BookModal(): ReactElement | null {
   const book = useAppSelector((state) => state.search.activeBook);
   const dispatch = useAppDispatch();
+  const [failedBookId, setFailedBookId] = useState<number | null>(null);
 
-  const [imageError, setImageError] = useState(false);
-
-  // Сбрасываем ошибку обложки при открытии другой книги
-  useEffect(() => {
-    setImageError(false);
-  }, [book?.id]);
-
-  // Если ни одна книга не выбрана — модалка не выводится
   if (!book) return null;
 
   const coverUrl = book.formats['image/jpeg'];
-  const baseUrl =
-    import.meta.env.VITE_GUTENDEX_URL ?? 'https://gutendex-tqvo.onrender.com';
-  const proxiedCoverUrl = coverUrl
-    ? `${baseUrl}/proxy-image/?url=${encodeURIComponent(coverUrl)}`
-    : null;
+  const showCover = Boolean(coverUrl) && failedBookId !== book.id;
+
   const authors =
     book.authors.map((a) => formatAuthorName(a.name)).join(', ') || 'Неизвестный автор';
 
-  const showCover = coverUrl && !imageError;
-  // Ищем ссылку на чтение/скачивание (обычно html или текстовый формат)
-  const readUrl = book.formats['text/html'] || book.formats['text/plain; charset=utf-8'];
+  const readUrl =
+    book.formats['text/html'] ||
+    book.formats['text/plain; charset=utf-8'] ||
+    book.formats['text/plain; charset=us-ascii'];
+
+  const handleClose = (): void => {
+    dispatch(setActiveBook(null));
+  };
 
   return (
-    // Задний полупрозрачный фон. Клик по нему закрывает модалку.
-    <div className='book-modal-backdrop' onClick={() => dispatch(setActiveBook(null))}>
-      {/* Само белое/темное окошко. e.stopPropagation() не дает окну закрыться при клике внутри него */}
+    <div className='book-modal-backdrop' onClick={handleClose}>
       <div className='book-modal' onClick={(e) => e.stopPropagation()}>
         <button
           type='button'
           className='book-modal__close'
-          onClick={() => dispatch(setActiveBook(null))}
+          onClick={handleClose}
+          aria-label='Закрыть'
         >
           ✕
         </button>
 
         <div className='book-modal__container'>
-          {/* Левая колонка: Обложка */}
           <div className='book-modal__left'>
             <div className='book-modal__cover-wrapper'>
               {showCover ? (
                 <img
-                  src={proxiedCoverUrl ?? undefined}
+                  src={coverUrl}
                   alt={book.title}
                   className='book-modal__cover'
-                  loading='lazy'
-                  onError={() => setImageError(true)}
+                  onError={() => setFailedBookId(book.id)}
                 />
               ) : (
                 <div className='book-modal__no-cover'>
@@ -76,7 +69,6 @@ export default function BookModal(): ReactElement | null {
             </div>
           </div>
 
-          {/* Правая колонка: Информация */}
           <div className='book-modal__right'>
             <span className='book-modal__type-tag'>Книга</span>
             <h2 className='book-modal__title'>{book.title}</h2>
@@ -94,7 +86,7 @@ export default function BookModal(): ReactElement | null {
                 </a>
               )}
               <span className='book-modal__downloads'>
-                ⬇ {book.download_count.toLocaleString()} скачиваний
+                ⬇ {book.download_count.toLocaleString('ru-RU')} скачиваний
               </span>
             </div>
 

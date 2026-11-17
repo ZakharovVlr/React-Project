@@ -21,7 +21,7 @@ export type SearchState = {
 
 const initialState: SearchState = {
   searchQuery: '',
-  language: 'en',
+  language: '',
   topic: '',
   books: [],
   activeBook: null,
