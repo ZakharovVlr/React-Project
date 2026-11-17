@@ -3,12 +3,25 @@
    src/components/Header.tsx
 */
 }
-import { useState } from 'react';
-import { FaGithub } from 'react-icons/fa';
+import { useEffect, useState } from 'react';
+import { FaGithub, FaInfoCircle, FaBug, FaMoon, FaSun, FaGlobe } from 'react-icons/fa';
 
 import type { ReactElement } from 'react';
 
 export default function Header(): ReactElement {
+  const [theme, setTheme] = useState<'dark' | 'light'>(() => {
+    const saved = localStorage.getItem('colbook-theme');
+    return saved === 'light' ? 'light' : 'dark';
+  });
+
+  useEffect(() => {
+    document.documentElement.setAttribute('data-theme', theme);
+    localStorage.setItem('colbook-theme', theme);
+  }, [theme]);
+
+  const toggleTheme = (): void => {
+    setTheme((prev) => (prev === 'dark' ? 'light' : 'dark'));
+  };
   const [isMenuOpen, setMenuOpen] = useState(false);
   return (
     <header className='header'>
@@ -39,10 +52,28 @@ export default function Header(): ReactElement {
           </button>
         </div>
         <ul className='header__menu-list'>
-          <li className='header__menu-item'>О проекте</li>
-          <li className='header__menu-item'>Сообщить об ошибке</li>
-          <li className='header__menu-item'>Тема</li>
-          <li className='header__menu-item'>Язык</li>
+          <li className='header__menu-item'>
+            <FaInfoCircle size={24} />
+            <span>О проекте</span>
+          </li>
+          <li className='header__menu-item'>
+            <FaBug size={24} />
+            <span>Сообщить об ошибке</span>
+          </li>
+          <li
+            className='header__menu-item'
+            onClick={toggleTheme}
+            role='button'
+            tabIndex={0}
+          >
+            {theme === 'dark' ? <FaSun size={24} /> : <FaMoon size={24} />}
+            <span>{theme === 'dark' ? 'Светлая тема' : 'Тёмная тема'}</span>
+          </li>
+
+          <li className='header__menu-item'>
+            <FaGlobe size={24} />
+            <span>Язык</span>
+          </li>
           <li className='header__menu-item'>
             <a
               href='https://github.com/ZakharovVlr/React-Project.git'

@@ -91,11 +91,19 @@ export default function BookModal(): ReactElement | null {
             </div>
 
             <div className='book-modal__details'>
-              <h3>О книге</h3>
-              <p>
-                Этот текст является общественным достоянием и предоставлен каталогом
-                Project Gutenberg.
-              </p>
+              <div className='book-modal__about'>
+                <h3>О книге</h3>
+                {book.summaries && book.summaries.length > 0 ? (
+                  <p className='book-modal__description'>{book.summaries[0]}</p>
+                ) : (
+                  <p className='book-modal__description'>
+                    {book.subjects && book.subjects.length > 0
+                      ? `Жанры и темы: ${book.subjects.slice(0, 4).join(', ')}.`
+                      : 'Этот текст является общественным достоянием и предоставлен каталогом библиотеки.'}
+                  </p>
+                )}
+              </div>
+
               {book.languages.length > 0 && (
                 <div className='book-modal__meta-item'>
                   <strong>Язык оригинала:</strong>{' '}

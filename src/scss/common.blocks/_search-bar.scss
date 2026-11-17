@@ -28,26 +28,30 @@
         }
     }
 
-    &__clear-btn {
+        &__clear-btn {
         position: absolute;
-        right: 14px;
+        right: 12px;
+        top: 50%; // [ДОБАВЛЕНО] Центрируем строго по вертикали
+        transform: translateY(-50%); // [ДОБАВЛЕНО] Точная коррекция центра
         display: flex;
         align-items: center;
         justify-content: center;
-        width: 24px;
-        height: 24px;
+        width: 28px;
+        height: 28px;
+        padding: 0;
+        border: none; // [ДОБАВЛЕНО] Тонкая рамка в стиле карточек и категорий
+        border-radius: 50%;
+        background: var(--color-surface); // [ДОБАВЛЕНО] Лёгкий тёмный фон вместо белого квадрата
         color: var(--color-text-muted);
+        font-size: 24px; // [ДОБАВЛЕНО] Размер символа ✕
+        line-height: 1;
         cursor: pointer;
-        transition: color 0.2s;
+        transition: color 0.2s, background-color 0.2s, border-color 0.2s;
 
         &:hover {
-            color: var(--color-text);
-        }
-
-        svg {
-            width: 20px;
-            height: 20px;
-            display: block;
+            color: var(--color-accent-border);
+            border-color: var(--color-text-muted);
         }
     }
+
 }

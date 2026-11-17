@@ -1,15 +1,28 @@
 // Сетка для списка карточек
 .books-list {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(175px, 1fr));
+    // [ИЗМЕНЕНО] Уменьшили минимальный размер колонки с 175px до 145px, чтобы карточки были компактнее
+    grid-template-columns: repeat(auto-fill, minmax(145px, 1fr));
     gap: 16px;
     padding: 24px 0;
     width: 100%;
 
-    // На мобильных экранах (включая 350–400 px) строго 2 карточки в ряд
-    @media (max-width: 480px) {
-        grid-template-columns: repeat(2, 1fr);
+    // [ДОБАВЛЕНО] Планшеты и небольшие окна: строго 4 колонки, чтобы 4 маленькие карточки не превращались в 3 огромные
+    @media (max-width: 900px) {
+        grid-template-columns: repeat(4, 1fr);
+        gap: 14px;
+    }
+
+    // [ДОБАВЛЕНО] Широкие телефоны и узкие окна: строго 3 компактные колонки
+    @media (max-width: 650px) {
+        grid-template-columns: repeat(3, 1fr);
         gap: 12px;
+    }
+
+    // [ИЗМЕНЕНО] Мобильные экраны (уменьшили порог с 480px до 450px): строго 2 колонки
+    @media (max-width: 450px) {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 10px;
         padding: 16px 0;
     }
 
@@ -29,7 +42,7 @@
     flex-direction: column;
     background: var(--color-surface); // Берем ваш текущий цвет инпута
     border: 1px solid var(--color-border);
-    border-radius: 12px;
+    border-radius: 5px;
     overflow: hidden;
     transition: transform 0.2s ease, border-color 0.2s ease;
     height: 100%;
@@ -49,7 +62,7 @@
         position: relative;
         width: 100%;
         aspect-ratio: 2 / 3; // Пропорции стандартной книги
-        background: #121212;
+        background: var(--color-surface);
         overflow: hidden;
         border-bottom: 1px solid var(--color-border);
     }
@@ -70,24 +83,25 @@
         color: var(--color-text);
         opacity: 0.4;
         font-size: 14px;
-        background: linear-gradient(135deg, #1e1e1e 0%, #121212 100%);
+        background: linear-gradient(135deg, #8aeb79 0%, #000000 100%);
     }
 
     // Текстовый блок карточки
-        &__info {
+    &__info {
         display: flex;
         flex-direction: column;
-        padding: 12px;
+        padding: 8px 10px; // [ИЗМЕНЕНО] Сделали боковые отступы чуть компактнее под новую ширину
         flex-grow: 1;
 
-        @media (max-width: 480px) {
-            padding: 4px 8px;
+        // [ИЗМЕНЕНО] Подстроили брейкпоинт под новую сетку (650px вместо 480px)
+        @media (max-width: 650px) {
+            padding: 6px 8px;
         }
     }
 
-
     &__title {
-        font-size: 14px;
+        font-size: 13px; // [ИЗМЕНЕНО] Уменьшили с 14px до 13px для компактных карточек
+        line-height: 1.3; // [ДОБАВЛЕНО] Аккуратный межстрочный интервал для двух строк
         font-weight: 600;
         color: var(--color-text);
         margin: 0 0 4px 0;
@@ -100,10 +114,10 @@
     }
 
     &__author {
-        font-size: 12px;
+        font-size: 11px; // [ИЗМЕНЕНО] Уменьшили с 12px до 11px, чтобы имя автора не обрезалось слишком рано
         color: var(--color-text);
         opacity: 0.6;
-        margin: 0 0 8px 0;
+        margin: 0 0 4px 0; // [ИЗМЕНЕНО] Уменьшили нижний отступ с 8px до 4px
 
         // Многоточие для авторов (1 строка)
         white-space: nowrap;
@@ -111,40 +125,19 @@
         text-overflow: ellipsis;
     }
 
-    // Нижняя часть карточки (скачивания и т.д.)
-    &__footer {
-        margin-top: auto; // Прижимает футер к самому низу карточки
+    // Контейнер лоадера обложки (центрирует спиннер внутри обертки)
+    &__image-loader {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
         display: flex;
         align-items: center;
-        justify-content: space-between;
+        justify-content: center;
+        background: #1a1a1a;
+        z-index: 2;
     }
-
-    &__downloads {
-        font-size: 11px;
-        color: var(--color-text);
-        opacity: 0.5;
-        background: rgba(255, 255, 255, 0.05);
-        padding: 3px 6px;
-        border-radius: 6px;
-
-        @media (max-width: 480px) {
-            display: none;
-        }
-    }
-
-// Контейнер лоадера обложки (центрирует спиннер внутри обертки)
-&__image-loader {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: #1a1a1a;
-    z-index: 2;
-}
 
     // Скрываем обложку (делаем прозрачной), пока она полностью не скачается
     &--hidden {
@@ -152,10 +145,55 @@
     }
 }
 
-
 // Модификатор для вашего существующего спиннера, чтобы сделать его меньше
 .loader__spinner--mini {
     width: 24px;
     height: 24px;
     border-width: 2px;
+}
+
+.books-list__more-wrapper {
+    display: flex;
+    flex-direction: column; // Выстраиваем кнопку и счетчик друг под другом
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    min-height: 64px;
+    padding: 16px 0 40px;
+    width: 100%;
+}
+
+.books-list__counter {
+    margin: 0;
+    font-family: var(--font-serif); // Тот же шрифт, что у кнопки
+    font-size: 13px;
+    color: var(--color-text-muted);
+}
+
+.books-list__more-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 190px;
+    height: 44px;
+    padding: 0 20px;
+    font-family: var(--font-serif);
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--color-text);
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: 100px;
+    cursor: pointer;
+    transition: border-color 0.2s, background-color 0.2s, transform 0.2s;
+
+    &:hover {
+        border-color: var(--color-accent-border);
+        background: var(--color-accent);
+        transform: translateY(-2px);
+    }
+
+    &:active {
+        transform: translateY(0);
+    }
 }

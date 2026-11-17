@@ -1,0 +1,71 @@
+.footer {
+    margin-top: auto; // Прижимает футер к низу экрана, если контента мало
+    width: 100%;
+    border-top: 1px solid var(--color-border);
+    background: var(--color-bg);
+    font-family: var(--font-serif);
+    color: var(--color-text-muted);
+    padding: 32px 0 24px;
+
+    &__container {
+        max-width: 1200px; // Подгони под ширину твоего основного контейнера
+        margin: 0 auto;
+        padding: 0 20px;
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+    }
+
+    &__brand {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+    }
+
+    &__logo {
+        font-size: 25px;
+        font-weight: 700;
+        font-family: var(--font-display);
+        color: var(--color-text);
+    }
+
+    &__tagline {
+        margin: 0;
+        font-size: 12px;
+        line-height: 1.5;
+        max-width: 460px;
+    }
+
+    &__links {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 20px;
+    }
+
+    &__link {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        color: var(--color-text);
+        text-decoration: none;
+        font-size: 14px;
+        opacity: 0.8;
+        transition: opacity 0.2s, color 0.2s;
+
+        &:hover {
+            opacity: 1;
+            color: var(--color-accent-border);
+        }
+    }
+
+    &__bottom {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 12px;
+        padding-top: 16px;
+        border-top: 1px solid var(--color-border);
+        font-size: 12px;
+    }
+}

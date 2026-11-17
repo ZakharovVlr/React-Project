@@ -3,7 +3,7 @@
     font-family: var(--font-serif);
 
     @media (max-width: 400px) {
-        margin-top: 20px
+        margin-top: 20px;
     }
 
     &__title {
@@ -18,24 +18,25 @@
         align-items: center;
         gap: 10px;
 
-        // На мобильных экранах в свернутом виде показываем ровно 2 строки
-        @media (max-width: 600px) {
-            &:not(&--expanded) {
-                max-height: 78px; // 2 строки кнопок + gap
-                overflow: hidden;
-            }
+        // [ИЗМЕНЕНО] Применяем ограничение ровно в 2 строки на ВСЕХ ширинах экрана, а не только до 600px
+        &:not(&--expanded) {
+            max-height: 70px; // Высота 2 кнопок (по 30px) + 1 отступ gap (10px)
+            overflow: hidden;
         }
     }
 
     &__item {
         font-family: var(--font-serif);
-        padding: 5px 15px;
-        border: 1px solid var(--color-border);
+        height: 30px; // [ДОБАВЛЕНО] Фиксируем высоту, чтобы 3-я строка гарантированно пряталась полностью
+        display: inline-flex; // [ДОБАВЛЕНО] Выравниваем текст внутри кнопки ровно по центру
+        align-items: center; // [ДОБАВЛЕНО]
+        padding: 0 15px; // [ИЗМЕНЕНО] Убрали вертикальный padding, так как теперь есть точная высота 30px
+        border: 1px solid var(--color-text);
         border-radius: 100px;
         background: transparent;
         color: var(--color-text);
-        border-color: var(--color-text);
         font-size: 13px;
+        white-space: nowrap; // [ДОБАВЛЕНО] Текст тега никогда не переносится на 2 строки
         cursor: pointer;
         transition: border-color 0.2s, color 0.2s, background-color 0.2s;
 
@@ -51,58 +52,20 @@
 
     &__toggle {
         font-family: var(--font-serif);
+        display: inline-block; // [ИЗМЕНЕНО] Единая кнопка под списком для всех экранов
+        margin-top: 10px; // [ДОБАВЛЕНО] Аккуратный отступ от второй строки категорий
         background: transparent;
         border: none;
-        padding: 5px 8px;
+        padding: 4px 0; // [ИЗМЕНЕНО] Выравниваем по левому краю с первой категорией
         color: var(--color-accent-border);
         font-size: 13px;
         font-weight: 600;
         cursor: pointer;
-        transition: opacity 0.2s;
+        transition: opacity 0.2s, color 0.2s;
 
         &:hover {
             opacity: 0.8;
             color: var(--color-accent);
         }
-
-        &--mobile {
-            display: none;
-            @media (max-width: 600px) {
-                display: inline-block;
-            }
-        }
-
-        &--desktop {
-            @media (max-width: 600px) {
-                display: none;
-            }
-        }
-
-        // На мобильных экранах переносим кнопку чуть ниже списка,
-        // чтобы она не обрезалась вместе с 3-й строкой
-        @media (max-width: 600px) {
-            padding-left: 0;
-        }
     }
-}
-
-.categories {
-    display: flex;
-    flex-wrap: nowrap; // запрещаем перенос
-    overflow-x: auto; // разрешаем горизонтальный скролл
-    gap: 12px;
-    padding-bottom: 8px; // место под возможный скроллбар, чтобы не обрезал кнопки снизу
-    -webkit-overflow-scrolling: touch; // плавный инерционный скролл на iOS
-
-    // Прячем сам скроллбар визуально, оставляя функциональность скролла
-    scrollbar-width: none; // Firefox
-
-    &::-webkit-scrollbar {
-        display: none; // Chrome/Safari
-    }
-}
-
-.category-chip {
-    flex-shrink: 0; // не даём кнопке сжиматься меньше её содержимого
-    white-space: nowrap; // текст внутри кнопки не переносится
 }

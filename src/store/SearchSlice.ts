@@ -12,11 +12,12 @@ export type SearchState = {
   books: Book[];
   // поле для открытой в модалке книги
   activeBook: Book | null;
-
   loadingStatus: 'idle' | 'loading' | 'succeeded' | 'failed';
   error: string | null;
-
-  cache: Record<string, Book[]>;
+  cache: Record<string, { results: Book[]; next: string | null; count: number }>;
+  nextUrl: string | null;
+  isLoadingMore: boolean;
+  totalCount: number;
 };
 
 const initialState: SearchState = {
@@ -28,6 +29,9 @@ const initialState: SearchState = {
   loadingStatus: 'idle',
   error: null,
   cache: {},
+  nextUrl: null,
+  isLoadingMore: false,
+  totalCount: 0,
 };
 
 export const fetchBooks = createAsyncThunk<
@@ -46,10 +50,10 @@ export const fetchBooks = createAsyncThunk<
   if (cached) {
     // Данные уже есть — отдаём их без похода на сервер
     return {
-      count: cached.length,
-      next: null,
+      count: cached.results.length,
+      next: cached.next,
       previous: null,
-      results: cached,
+      results: cached.results,
       cacheKey,
       fromCache: true,
     };
@@ -78,6 +82,31 @@ export const fetchBooks = createAsyncThunk<
       throw error;
     }
     return thunkAPI.rejectWithValue('Сбой сети, сервер недоступен');
+  }
+});
+
+export const fetchMoreBooks = createAsyncThunk<
+  APIResponse,
+  string, // Тип аргумента, который мы передаём при вызове (это ссылка nextUrl)
+  { rejectValue: string }
+>('search/fetchMoreBooks', async (nextUrl, thunkAPI) => {
+  try {
+    // Защита от Mixed Content: меняем http:// на https://, если сервер вернул http
+    const secureUrl = nextUrl.replace(/^http:\/\//i, 'https://');
+
+    // TODO 1: Сделай fetch-запрос по адресу secureUrl и сохрани в const response
+    const response = await fetch(secureUrl);
+
+    // TODO 2: Проверь, если !response.ok — верни thunkAPI.rejectWithValue('Ошибка загрузки')
+    if (!response.ok) {
+      return thunkAPI.rejectWithValue('Ошибка загрузки');
+    }
+
+    // TODO 3: Распарси JSON через await response.json() и верни результат
+    const data = (await response.json()) as APIResponse;
+    return data;
+  } catch (_error) {
+    return thunkAPI.rejectWithValue('Сбой сети при подгрузке книг');
   }
 });
 
@@ -135,7 +164,6 @@ export const bookSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
-      // Обработка вашего старого fetchBooks
       .addCase(fetchBooks.pending, (state) => {
         state.loadingStatus = 'loading';
         state.error = null;
@@ -143,14 +171,36 @@ export const bookSlice = createSlice({
       .addCase(fetchBooks.fulfilled, (state, action) => {
         state.loadingStatus = 'succeeded';
         state.books = action.payload.results;
+        state.nextUrl = action.payload.next; // Сохраняем ссылку на 2-ю страницу
+        state.totalCount = action.payload.count;
+
         if (!action.payload.fromCache) {
-          state.cache[action.payload.cacheKey] = action.payload.results;
+          state.cache[action.payload.cacheKey] = {
+            results: action.payload.results,
+            next: action.payload.next,
+            count: action.payload.count,
+          };
         }
       })
       .addCase(fetchBooks.rejected, (state, action) => {
         if (action.meta.aborted) return;
         state.loadingStatus = 'failed';
         state.error = action.payload ?? 'Произошла неизвестная ошибка';
+      })
+
+      // Обработка кнопки «Показать еще»
+      .addCase(fetchMoreBooks.pending, (state) => {
+        state.isLoadingMore = true;
+      })
+      .addCase(fetchMoreBooks.fulfilled, (state, action) => {
+        state.isLoadingMore = false;
+
+        state.books = [...state.books, ...action.payload.results];
+
+        state.nextUrl = action.payload.next;
+      })
+      .addCase(fetchMoreBooks.rejected, (state) => {
+        state.isLoadingMore = false;
       });
   },
 });

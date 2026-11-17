@@ -6,6 +6,7 @@
 
 /* src/components/BookCard.tsx */
 import { useState } from 'react';
+import { FaBookOpen } from 'react-icons/fa';
 
 import { useAppDispatch } from '../hooks/store';
 import { setActiveBook } from '../store/SearchSlice';
@@ -35,7 +36,9 @@ export default function BookCard({ book }: BookCardProps): React.JSX.Element {
             onError={() => setHasError(true)}
           />
         ) : (
-          <div className='book-card__no-cover'>Нет обложки</div>
+          <div className='book-card__no-cover'>
+            <FaBookOpen size={32} />
+          </div>
         )}
       </div>
 
@@ -46,11 +49,6 @@ export default function BookCard({ book }: BookCardProps): React.JSX.Element {
         <p className='book-card__author' title={authors}>
           {authors}
         </p>
-        <div className='book-card__footer'>
-          <span className='book-card__downloads'>
-            ⬇ {book.download_count.toLocaleString('ru-RU')}
-          </span>
-        </div>
       </div>
     </article>
   );

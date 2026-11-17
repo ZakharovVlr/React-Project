@@ -51,9 +51,7 @@ export default function SearchForm(): ReactElement {
           }}
           aria-label='Очистить поиск'
         >
-          <svg viewBox='0 -960 960 960' fill='currentColor'>
-            <path d='m256-200-56-56 224-224-224-224 56-56 224 224 224-224 56 56-224 224 224 224-56 56-224-224-224 224Z' />
-          </svg>
+          ✕
         </button>
       )}
     </form>

@@ -9,6 +9,7 @@ import BookList from './components/BookList';
 import BookModal from './components/BookModal';
 import CategoryHeader from './components/CategoryHeader';
 import CategoryList from './components/CategoryList';
+import Footer from './components/Footer';
 import Header from './components/Header';
 import Loader from './components/Loader';
 import SearchForm from './components/SearchForm';
@@ -43,6 +44,7 @@ export default function App(): ReactElement {
         <BookList />
       </main>
       <BookModal />
+      <Footer />
     </div>
   );
 }

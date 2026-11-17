@@ -14,6 +14,8 @@ export type Book = {
   download_count: number;
   // Словарь Record: ключ — формат (mp3, wav), значение — URL-ссылка
   formats: Record<string, string>;
+  summaries?: string[];
+  subjects?: string[];
 };
 
 export type APIResponse = {
