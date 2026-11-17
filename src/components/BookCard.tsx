@@ -15,15 +15,21 @@ type BookCardProps = {
   book: Book;
 };
 
+function formatAuthorName(name: string): string {
+  const [last, first] = name.split(', ');
+  return first ? `${first} ${last}` : last;
+}
+
 export default function BookCard({ book }: BookCardProps): React.JSX.Element {
-  function formatAuthorName(name: string): string {
-    const [last, first] = name.split(', ');
-    return first ? `${first} ${last}` : last;
-  }
   const dispatch = useAppDispatch();
   const [imageError, setImageError] = useState(false);
 
   const coverUrl = book.formats['image/jpeg'];
+  const baseUrl =
+    import.meta.env.VITE_GUTENDEX_URL ?? 'https://gutendex-tqvo.onrender.com';
+  const proxiedCoverUrl = coverUrl
+    ? `${baseUrl}/proxy-image/?url=${encodeURIComponent(coverUrl)}`
+    : null;
   const authors =
     book.authors.map((a) => formatAuthorName(a.name)).join(', ') || 'Неизвестный автор';
 
@@ -34,7 +40,7 @@ export default function BookCard({ book }: BookCardProps): React.JSX.Element {
       <div className='book-card__cover-wrapper'>
         {showCover ? (
           <img
-            src={coverUrl}
+            src={proxiedCoverUrl ?? undefined}
             alt={book.title}
             className='book-card__cover'
             loading='lazy'

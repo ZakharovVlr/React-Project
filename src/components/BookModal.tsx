@@ -11,6 +11,11 @@ import { setActiveBook } from '../store/SearchSlice';
 
 import type { ReactElement } from 'react';
 
+function formatAuthorName(name: string): string {
+  const [last, first] = name.split(', ');
+  return first ? `${first} ${last}` : last;
+}
+
 export default function BookModal(): ReactElement | null {
   const book = useAppSelector((state) => state.search.activeBook);
   const dispatch = useAppDispatch();
@@ -26,8 +31,13 @@ export default function BookModal(): ReactElement | null {
   if (!book) return null;
 
   const coverUrl = book.formats['image/jpeg'];
-  const authorsString =
-    book.authors.map((a) => a.name).join(', ') || 'Неизвестный автор';
+  const baseUrl =
+    import.meta.env.VITE_GUTENDEX_URL ?? 'https://gutendex-tqvo.onrender.com';
+  const proxiedCoverUrl = coverUrl
+    ? `${baseUrl}/proxy-image/?url=${encodeURIComponent(coverUrl)}`
+    : null;
+  const authors =
+    book.authors.map((a) => formatAuthorName(a.name)).join(', ') || 'Неизвестный автор';
 
   const showCover = coverUrl && !imageError;
   // Ищем ссылку на чтение/скачивание (обычно html или текстовый формат)
@@ -39,6 +49,7 @@ export default function BookModal(): ReactElement | null {
       {/* Само белое/темное окошко. e.stopPropagation() не дает окну закрыться при клике внутри него */}
       <div className='book-modal' onClick={(e) => e.stopPropagation()}>
         <button
+          type='button'
           className='book-modal__close'
           onClick={() => dispatch(setActiveBook(null))}
         >
@@ -51,7 +62,7 @@ export default function BookModal(): ReactElement | null {
             <div className='book-modal__cover-wrapper'>
               {showCover ? (
                 <img
-                  src={coverUrl}
+                  src={proxiedCoverUrl ?? undefined}
                   alt={book.title}
                   className='book-modal__cover'
                   loading='lazy'
@@ -69,7 +80,7 @@ export default function BookModal(): ReactElement | null {
           <div className='book-modal__right'>
             <span className='book-modal__type-tag'>Книга</span>
             <h2 className='book-modal__title'>{book.title}</h2>
-            <p className='book-modal__author'>{authorsString}</p>
+            <p className='book-modal__author'>{authors}</p>
 
             <div className='book-modal__actions'>
               {readUrl && (
