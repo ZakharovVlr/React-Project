@@ -2,6 +2,10 @@
     margin-top: 40px;
     font-family: var(--font-serif);
 
+    @media (max-width: 400px) {
+        margin-top: 20px
+    }
+
     &__title {
         font-size: 28px;
         font-weight: 700;

@@ -1,11 +1,17 @@
 // Сетка для списка карточек
 .books-list {
     display: grid;
-    // Магия: сетка сама рассчитывает колонки шириной минимум 220px
     grid-template-columns: repeat(auto-fill, minmax(175px, 1fr));
     gap: 16px;
     padding: 24px 0;
     width: 100%;
+
+    // На мобильных экранах (включая 350–400 px) строго 2 карточки в ряд
+    @media (max-width: 480px) {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 12px;
+        padding: 16px 0;
+    }
 
     &__empty {
         text-align: center;
@@ -13,6 +19,7 @@
         opacity: 0.6;
         padding: 40px 0;
         font-size: 16px;
+        grid-column: 1 / -1; // Чтобы надпись «Ничего не найдено» была по центру всей сетки
     }
 }
 
@@ -67,12 +74,17 @@
     }
 
     // Текстовый блок карточки
-    &__info {
+        &__info {
         display: flex;
         flex-direction: column;
         padding: 12px;
-        flex-grow: 1; // Растягивает блок на всю оставшуюся высоту
+        flex-grow: 1;
+
+        @media (max-width: 480px) {
+            padding: 4px 8px;
+        }
     }
+
 
     &__title {
         font-size: 14px;
@@ -114,6 +126,10 @@
         background: rgba(255, 255, 255, 0.05);
         padding: 3px 6px;
         border-radius: 6px;
+
+        @media (max-width: 480px) {
+            display: none;
+        }
     }
 
 // Контейнер лоадера обложки (центрирует спиннер внутри обертки)
