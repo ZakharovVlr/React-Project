@@ -15,6 +15,8 @@ export type SearchState = {
 
   loadingStatus: 'idle' | 'loading' | 'succeeded' | 'failed';
   error: string | null;
+
+  cache: Record<string, Book[]>;
 };
 
 const initialState: SearchState = {
@@ -25,42 +27,59 @@ const initialState: SearchState = {
   activeBook: null,
   loadingStatus: 'idle',
   error: null,
+  cache: {},
 };
 
-export const fetchBooks = createAsyncThunk<APIResponse, void, { rejectValue: string }>(
-  'search/fetchBooks',
-  async (_, thunkAPI) => {
-    try {
-      const state = thunkAPI.getState() as RootState;
-      const query = state.search.searchQuery;
-      const lang = state.search.language;
-      const topic = state.search.topic;
+export const fetchBooks = createAsyncThunk<
+  APIResponse & { cacheKey: string; fromCache: boolean },
+  void,
+  { rejectValue: string }
+>('search/fetchBooks', async (_, thunkAPI) => {
+  const state = thunkAPI.getState() as RootState;
+  const query = state.search.searchQuery;
+  const lang = state.search.language;
+  const topic = state.search.topic;
 
-      const params = new URLSearchParams();
-      if (query) params.append('search', query);
-      if (lang) params.append('languages', lang);
-      if (topic) params.append('topic', topic);
+  const cacheKey = `${query}|${lang}|${topic}`;
+  const cached = state.search.cache[cacheKey];
 
-      const baseUrl =
-        import.meta.env.VITE_GUTENDEX_URL ?? 'https://gutendex-tqvo.onrender.com/';
-      const response = await fetch(`${baseUrl}/books/?${params.toString()}`, {
-        signal: thunkAPI.signal,
-      });
-
-      if (!response.ok) {
-        return thunkAPI.rejectWithValue('Не удалось загрузить книги с сервера');
-      }
-
-      const data = (await response.json()) as APIResponse;
-      return data;
-    } catch (error) {
-      if (error instanceof DOMException && error.name === 'AbortError') {
-        throw error;
-      }
-      return thunkAPI.rejectWithValue('Сбой сети, сервер недоступен');
-    }
+  if (cached) {
+    // Данные уже есть — отдаём их без похода на сервер
+    return {
+      count: cached.length,
+      next: null,
+      previous: null,
+      results: cached,
+      cacheKey,
+      fromCache: true,
+    };
   }
-);
+
+  try {
+    const params = new URLSearchParams();
+    if (query) params.append('search', query);
+    if (lang) params.append('languages', lang);
+    if (topic) params.append('topic', topic);
+
+    const baseUrl =
+      import.meta.env.VITE_GUTENDEX_URL ?? 'https://gutendex-tqvo.onrender.com/';
+    const response = await fetch(`${baseUrl}/books/?${params.toString()}`, {
+      signal: thunkAPI.signal,
+    });
+
+    if (!response.ok) {
+      return thunkAPI.rejectWithValue('Не удалось загрузить книги с сервера');
+    }
+
+    const data = (await response.json()) as APIResponse;
+    return { ...data, cacheKey, fromCache: false };
+  } catch (error) {
+    if (error instanceof DOMException && error.name === 'AbortError') {
+      throw error;
+    }
+    return thunkAPI.rejectWithValue('Сбой сети, сервер недоступен');
+  }
+});
 
 // 2. ДОБАВЛЯЕМ новый thunk для параллельной загрузки категорий на главную страницу
 export const fetchMainPageSections = createAsyncThunk<
@@ -124,6 +143,9 @@ export const bookSlice = createSlice({
       .addCase(fetchBooks.fulfilled, (state, action) => {
         state.loadingStatus = 'succeeded';
         state.books = action.payload.results;
+        if (!action.payload.fromCache) {
+          state.cache[action.payload.cacheKey] = action.payload.results;
+        }
       })
       .addCase(fetchBooks.rejected, (state, action) => {
         if (action.meta.aborted) return;

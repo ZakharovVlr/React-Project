@@ -1,3 +1,9 @@
+{
+  /*
+   src/components/CategoryHeader.tsx
+*/
+}
+
 import { useAppDispatch, useAppSelector } from '../hooks/store';
 import { setTopic } from '../store/SearchSlice';
 
@@ -12,6 +18,7 @@ const TOPIC_LABELS: Record<string, string> = {
   'science fiction': 'Фантастика',
   thriller: 'Триллеры и хорроры',
   romance: 'Романтика',
+  'fairy tales': 'Сказки',
   history: 'Исторический роман',
   adventure: 'Приключения',
   poetry: 'Поэзия и драма',
@@ -23,7 +30,11 @@ const TOPIC_LABELS: Record<string, string> = {
   horror: 'Триллеры и хорроры',
   mystery: 'Детективы',
   'historical fiction': 'Исторический роман',
-  mythology: 'Религия и мифология',
+  humor: 'Юмор и сатира',
+  drama: 'Пьесы',
+  politics: 'Политика и право',
+  cookery: 'Кулинария',
+  travel: 'Путешествия',
 };
 
 export default function CategoryHeader(): ReactElement | null {

@@ -11,7 +11,16 @@
     &__items {
         display: flex;
         flex-wrap: wrap;
+        align-items: center;
         gap: 10px;
+
+        // На мобильных экранах в свернутом виде показываем ровно 2 строки
+        @media (max-width: 600px) {
+            &:not(&--expanded) {
+                max-height: 78px; // 2 строки кнопок + gap
+                overflow: hidden;
+            }
+        }
     }
 
     &__item {
@@ -24,10 +33,72 @@
         border-color: var(--color-text);
         font-size: 13px;
         cursor: pointer;
-        transition: border-color 0.2s, color 0.2s;
+        transition: border-color 0.2s, color 0.2s, background-color 0.2s;
 
         &:hover {
-            border-color: var(--color-border);
+            border-color: var(--color-accent-border);
+        }
+
+        &--active {
+            background: var(--color-text);
+            color: var(--color-surface, #1e1e1e);
         }
     }
+
+    &__toggle {
+        font-family: var(--font-serif);
+        background: transparent;
+        border: none;
+        padding: 5px 8px;
+        color: var(--color-accent-border);
+        font-size: 13px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: opacity 0.2s;
+
+        &:hover {
+            opacity: 0.8;
+            color: var(--color-accent);
+        }
+
+        &--mobile {
+            display: none;
+            @media (max-width: 600px) {
+                display: inline-block;
+            }
+        }
+
+        &--desktop {
+            @media (max-width: 600px) {
+                display: none;
+            }
+        }
+
+        // На мобильных экранах переносим кнопку чуть ниже списка,
+        // чтобы она не обрезалась вместе с 3-й строкой
+        @media (max-width: 600px) {
+            padding-left: 0;
+        }
+    }
+}
+
+.categories {
+    display: flex;
+    flex-wrap: nowrap; // запрещаем перенос
+    overflow-x: auto; // разрешаем горизонтальный скролл
+    gap: 12px;
+    padding-bottom: 8px; // место под возможный скроллбар, чтобы не обрезал кнопки снизу
+    -webkit-overflow-scrolling: touch; // плавный инерционный скролл на iOS
+
+    // Прячем сам скроллбар визуально, оставляя функциональность скролла
+    scrollbar-width: none; // Firefox
+
+    &::-webkit-scrollbar {
+        display: none; // Chrome/Safari
+    }
+}
+
+.category-chip {
+    flex-shrink: 0; // не даём кнопке сжиматься меньше её содержимого
+    white-space: nowrap; // текст внутри кнопки не переносится
 }

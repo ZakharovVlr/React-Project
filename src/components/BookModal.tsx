@@ -3,6 +3,9 @@
    src/components/BookModal.tsx
 */
 }
+import { useState, useEffect } from 'react';
+import { FaBookOpen } from 'react-icons/fa';
+
 import { useAppSelector, useAppDispatch } from '../hooks/store';
 import { setActiveBook } from '../store/SearchSlice';
 
@@ -12,6 +15,13 @@ export default function BookModal(): ReactElement | null {
   const book = useAppSelector((state) => state.search.activeBook);
   const dispatch = useAppDispatch();
 
+  const [imageError, setImageError] = useState(false);
+
+  // Сбрасываем ошибку обложки при открытии другой книги
+  useEffect(() => {
+    setImageError(false);
+  }, [book?.id]);
+
   // Если ни одна книга не выбрана — модалка не выводится
   if (!book) return null;
 
@@ -19,6 +29,7 @@ export default function BookModal(): ReactElement | null {
   const authorsString =
     book.authors.map((a) => a.name).join(', ') || 'Неизвестный автор';
 
+  const showCover = coverUrl && !imageError;
   // Ищем ссылку на чтение/скачивание (обычно html или текстовый формат)
   const readUrl = book.formats['text/html'] || book.formats['text/plain; charset=utf-8'];
 
@@ -38,10 +49,18 @@ export default function BookModal(): ReactElement | null {
           {/* Левая колонка: Обложка */}
           <div className='book-modal__left'>
             <div className='book-modal__cover-wrapper'>
-              {coverUrl ? (
-                <img src={coverUrl} alt={book.title} className='book-modal__cover' />
+              {showCover ? (
+                <img
+                  src={coverUrl}
+                  alt={book.title}
+                  className='book-modal__cover'
+                  loading='lazy'
+                  onError={() => setImageError(true)}
+                />
               ) : (
-                <div className='book-modal__no-cover'>Нет обложки</div>
+                <div className='book-modal__no-cover'>
+                  <FaBookOpen size={32} />
+                </div>
               )}
             </div>
           </div>
@@ -60,7 +79,7 @@ export default function BookModal(): ReactElement | null {
                   rel='noreferrer'
                   className='book-modal__btn-read'
                 >
-                  Читать онлайн
+                  Читать
                 </a>
               )}
               <span className='book-modal__downloads'>
@@ -74,7 +93,6 @@ export default function BookModal(): ReactElement | null {
                 Этот текст является общественным достоянием и предоставлен каталогом
                 Project Gutenberg.
               </p>
-
               {book.languages.length > 0 && (
                 <div className='book-modal__meta-item'>
                   <strong>Язык оригинала:</strong>{' '}

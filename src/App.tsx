@@ -20,7 +20,9 @@ import type { ReactElement } from 'react';
 export default function App(): ReactElement {
   const status = useAppSelector((state) => state.search.loadingStatus);
   const error = useAppSelector((state) => state.search.error);
-  const { searchQuery, language, topic } = useAppSelector((state) => state.search);
+  const searchQuery = useAppSelector((state) => state.search.searchQuery);
+  const language = useAppSelector((state) => state.search.language);
+  const topic = useAppSelector((state) => state.search.topic);
   const dispatch = useAppDispatch();
 
   useEffect(() => {

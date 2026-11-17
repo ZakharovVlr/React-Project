@@ -9,13 +9,18 @@
 @use 'common.blocks/_book-rows';
 @use 'common.blocks/_book-modal';
 
+* {
+    box-sizing: border-box;
+}
+
 :root {
     --color-bg: #1e1d1d;
     --color-surface: #2a2a2a;
     --color-text: #ffffff;
     --color-text-muted: #9a9a9a;
-    --color-accent: #0579f5;
-    --color-border: #737373;
+    --color-accent: #5efd83;
+    --color-accent-border: #23b845;
+    --color-border: #515151;
     --font-serif: 'Noto Serif', Georgia, serif;
     --font-display: 'EB Garamond', Georgia, serif;
     --font-pixel: 'Bitcount Single', monospace;
