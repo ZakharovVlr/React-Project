@@ -8,13 +8,13 @@
     padding: 40px 0;
 
     &__sprite {
-            width: 96px;
-            height: 80px;
-            background-repeat: no-repeat;
-            background-size: 2100% 100%; 
-            image-rendering: pixelated;
-            animation: book-flip 0.6s steps(20) infinite;
-        }
+        width: 96px;
+        height: 80px;
+        background-repeat: no-repeat;
+        background-size: 2100% 100%; 
+        image-rendering: pixelated;
+        animation: book-flip 0.6s steps(20) infinite;
+    }
 
     &__text {
         font-family: var(--font-serif);

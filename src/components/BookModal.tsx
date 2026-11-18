@@ -8,7 +8,7 @@ import { useState } from 'react';
 import { FaBookOpen } from 'react-icons/fa';
 
 import { useAppSelector, useAppDispatch } from '../hooks/store';
-import { setActiveBook } from '../store/SearchSlice';
+import { setActiveBook, setSearchQuery, setTopic } from '../store/SearchSlice';
 
 import type { ReactElement } from 'react';
 
@@ -36,6 +36,18 @@ export default function BookModal(): ReactElement | null {
     book.formats['text/plain; charset=us-ascii'];
 
   const handleClose = (): void => {
+    dispatch(setActiveBook(null));
+  };
+
+  // Объединяем subjects и bookshelves, убираем дубликаты и технические префиксы
+  const rawTags = [...(book.subjects ?? []), ...(book.bookshelves ?? [])];
+  const cleanedTags = Array.from(
+    new Set(rawTags.map((tag) => tag.replace(/^(Category:|Browsing:)\s*/i, '').trim()))
+  );
+
+  const handleTagClick = (tag: string): void => {
+    dispatch(setSearchQuery(''));
+    dispatch(setTopic(tag));
     dispatch(setActiveBook(null));
   };
 
@@ -103,6 +115,24 @@ export default function BookModal(): ReactElement | null {
                   </p>
                 )}
               </div>
+
+              {cleanedTags.length > 0 && (
+                <div className='book-modal__tags-section'>
+                  <span className='book-modal__tags-label'>Категории и темы:</span>
+                  <div className='book-modal__tags'>
+                    {cleanedTags.map((tag) => (
+                      <button
+                        key={tag}
+                        type='button'
+                        className='book-modal__tag'
+                        onClick={() => handleTagClick(tag)}
+                      >
+                        {tag}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
 
               {book.languages.length > 0 && (
                 <div className='book-modal__meta-item'>

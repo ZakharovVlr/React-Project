@@ -5,12 +5,12 @@
     background: var(--color-bg);
     font-family: var(--font-serif);
     color: var(--color-text-muted);
-    padding: 32px 0 24px;
+    padding: 32px 0;
 
     &__container {
-        max-width: 1200px; // Подгони под ширину твоего основного контейнера
+        max-width: 1280px;
+        padding: 0 32px; // Подгони под ширину твоего основного контейнера
         margin: 0 auto;
-        padding: 0 20px;
         display: flex;
         flex-direction: column;
         gap: 20px;
