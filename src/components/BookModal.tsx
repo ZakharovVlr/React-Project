@@ -9,13 +9,9 @@ import { FaBookOpen } from 'react-icons/fa';
 
 import { useAppSelector, useAppDispatch } from '../hooks/store';
 import { setActiveBook, setSearchQuery, setTopic } from '../store/SearchSlice';
+import { formatAuthorName } from '../utils/formatAuthorName';
 
 import type { ReactElement } from 'react';
-
-function formatAuthorName(name: string): string {
-  const [last, first] = name.split(', ');
-  return first ? `${first} ${last}` : last;
-}
 
 export default function BookModal(): ReactElement | null {
   const book = useAppSelector((state) => state.search.activeBook);

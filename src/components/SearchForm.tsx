@@ -28,8 +28,8 @@ export default function SearchForm(): ReactElement {
       return;
     }
 
+    const q = inputValue.trim().toLowerCase();
     const controller = new AbortController();
-
     const timer = setTimeout(() => {
       const fetchSuggestions = async (): Promise<void> => {
         try {
@@ -43,7 +43,15 @@ export default function SearchForm(): ReactElement {
           if (!response.ok) return;
 
           const data = (await response.json()) as APIResponse;
-          setSuggestions(data.results.slice(0, 7));
+          //проверяем два условия
+          const dataFiltered = data.results.filter(
+            (book) =>
+              //Название книги в нижнем регистре начинается с q
+              book.title.toLowerCase().startsWith(q) ||
+              //имя хотя бы одного автора в нижнем регистре начинается с q
+              book.authors.some((author) => author.name.toLowerCase().startsWith(q))
+          );
+          setSuggestions(dataFiltered.slice(0, 7));
           setIsOpen(true);
         } catch (error) {
           if (error instanceof DOMException && error.name === 'AbortError') return;

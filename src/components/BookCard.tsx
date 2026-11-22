@@ -5,11 +5,12 @@
 }
 
 /* src/components/BookCard.tsx */
-import { useState } from 'react';
+import { memo, useState } from 'react';
 import { FaBookOpen } from 'react-icons/fa';
 
 import { useAppDispatch } from '../hooks/store';
 import { setActiveBook } from '../store/SearchSlice';
+import { formatAuthorName } from '../utils/formatAuthorName';
 
 import type { Book } from '../types/api';
 
@@ -17,12 +18,13 @@ type BookCardProps = {
   book: Book;
 };
 
-export default function BookCard({ book }: BookCardProps): React.JSX.Element {
+function BookCard({ book }: BookCardProps): React.JSX.Element {
   const dispatch = useAppDispatch();
   const [hasError, setHasError] = useState(false);
 
   const coverUrl = book.formats['image/jpeg'];
-  const authors = book.authors.map((a) => a.name).join(', ') || 'Неизвестный автор';
+  const authors =
+    book.authors.map((a) => formatAuthorName(a.name)).join(', ') || 'Неизвестный автор';
 
   return (
     <article className='book-card' onClick={() => dispatch(setActiveBook(book))}>
@@ -53,3 +55,5 @@ export default function BookCard({ book }: BookCardProps): React.JSX.Element {
     </article>
   );
 }
+
+export default memo(BookCard);

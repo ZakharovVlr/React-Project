@@ -50,7 +50,7 @@ export const fetchBooks = createAsyncThunk<
   if (cached) {
     // Данные уже есть — отдаём их без похода на сервер
     return {
-      count: cached.results.length,
+      count: cached.count,
       next: cached.next,
       previous: null,
       results: cached.results,
@@ -66,7 +66,7 @@ export const fetchBooks = createAsyncThunk<
     if (topic) params.append('topic', topic);
 
     const baseUrl =
-      import.meta.env.VITE_GUTENDEX_URL ?? 'https://gutendex-tqvo.onrender.com/';
+      import.meta.env.VITE_GUTENDEX_URL ?? 'https://gutendex-tqvo.onrender.com';
     const response = await fetch(`${baseUrl}/books/?${params.toString()}`, {
       signal: thunkAPI.signal,
     });
@@ -94,15 +94,12 @@ export const fetchMoreBooks = createAsyncThunk<
     // Защита от Mixed Content: меняем http:// на https://, если сервер вернул http
     const secureUrl = nextUrl.replace(/^http:\/\//i, 'https://');
 
-    // TODO 1: Сделай fetch-запрос по адресу secureUrl и сохрани в const response
     const response = await fetch(secureUrl);
 
-    // TODO 2: Проверь, если !response.ok — верни thunkAPI.rejectWithValue('Ошибка загрузки')
     if (!response.ok) {
       return thunkAPI.rejectWithValue('Ошибка загрузки');
     }
 
-    // TODO 3: Распарси JSON через await response.json() и верни результат
     const data = (await response.json()) as APIResponse;
     return data;
   } catch (_error) {
@@ -117,7 +114,8 @@ export const fetchMainPageSections = createAsyncThunk<
   { rejectValue: string }
 >('search/fetchMainPageSections', async (_, thunkAPI) => {
   try {
-    const baseUrl = import.meta.env.VITE_GUTENDEX_URL ?? 'http://localhost:8000';
+    const baseUrl =
+      import.meta.env.VITE_GUTENDEX_URL ?? 'https://gutendex-tqvo.onrender.com';
 
     // Запускаем 3 запроса параллельно, чтобы страница грузилась мгновенно
     const [classicsRes, thrillersRes, loveStoriesRes] = await Promise.all([
@@ -194,10 +192,17 @@ export const bookSlice = createSlice({
       })
       .addCase(fetchMoreBooks.fulfilled, (state, action) => {
         state.isLoadingMore = false;
-
         state.books = [...state.books, ...action.payload.results];
-
         state.nextUrl = action.payload.next;
+
+        const cacheKey = `${state.searchQuery}|${state.language}|${state.topic}`;
+        if (state.cache[cacheKey]) {
+          state.cache[cacheKey] = {
+            results: state.books,
+            next: state.nextUrl,
+            count: state.totalCount,
+          };
+        }
       })
       .addCase(fetchMoreBooks.rejected, (state) => {
         state.isLoadingMore = false;

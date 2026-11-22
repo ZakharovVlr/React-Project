@@ -3,6 +3,7 @@
 
 interface ImportMetaEnv {
   readonly VITE_GUTENDEX_URL?: string;
+  readonly VITE_HAWK_TOKEN: string;
 }
 
 interface ImportMeta {

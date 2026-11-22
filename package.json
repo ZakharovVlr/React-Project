@@ -30,6 +30,7 @@
     "**/*.{json,html,md}": "prettier --write"
   },
   "dependencies": {
+    "@hawk.so/javascript": "^3.3.5",
     "@reduxjs/toolkit": "^2.14.0",
     "react": "^19.1.1",
     "react-dom": "^19.1.1",

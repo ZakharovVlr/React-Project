@@ -9,6 +9,7 @@ import BookList from './components/BookList';
 import BookModal from './components/BookModal';
 import CategoryHeader from './components/CategoryHeader';
 import CategoryList from './components/CategoryList';
+import { ErrorBoundary } from './components/ErrorBoundary';
 import Footer from './components/Footer';
 import Header from './components/Header';
 import Loader from './components/Loader';
@@ -41,9 +42,13 @@ export default function App(): ReactElement {
         <CategoryHeader />
         {status === 'loading' && <Loader />}
         {status === 'failed' && <div className='error-message'>{error}</div>}
-        <BookList />
+        <ErrorBoundary>
+          <BookList />
+        </ErrorBoundary>
       </main>
-      <BookModal />
+      <ErrorBoundary>
+        <BookModal />
+      </ErrorBoundary>
       <Footer />
     </div>
   );

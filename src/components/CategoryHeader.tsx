@@ -36,6 +36,7 @@ const TOPIC_LABELS: Record<string, string> = {
   humor: 'Юмор и сатира',
   cookery: 'Кулинария',
   travel: 'Путешествия',
+  biography: 'Биографии и мемуары',
 };
 
 export default function CategoryHeader(): ReactElement | null {

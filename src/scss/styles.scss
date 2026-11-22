@@ -22,6 +22,7 @@
     --color-accent: #5efd83;
     --color-accent-border: #23b845;
     --color-border: #515151;
+    --color-error: #ff0000;
     --font-serif: 'Noto Serif', Georgia, serif;
     --font-display: 'EB Garamond', Georgia, serif;
     --font-pixel: 'Bitcount Single', monospace;
@@ -68,4 +69,12 @@ body {
     flex-direction: column;
 }
 
+.error-message {
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: var(--color-error);
+}
 
