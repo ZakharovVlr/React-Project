@@ -12,6 +12,7 @@ import CategoryList from './components/CategoryList';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import Footer from './components/Footer';
 import Header from './components/Header';
+import HomeShelves from './components/HomeShelves';
 import Loader from './components/Loader';
 import SearchForm from './components/SearchForm';
 import { useAppDispatch, useAppSelector } from './hooks/store';
@@ -27,24 +28,38 @@ export default function App(): ReactElement {
   const topic = useAppSelector((state) => state.search.topic);
   const dispatch = useAppDispatch();
 
+  const isHomeView = !searchQuery && !topic;
+
   useEffect(() => {
+    if (isHomeView) return;
+
     const promise = dispatch(fetchBooks());
     return (): void => {
       promise.abort();
     };
-  }, [searchQuery, language, topic, dispatch]);
+  }, [searchQuery, language, topic, isHomeView, dispatch]);
+
   return (
     <div className='page'>
       <Header />
       <main className='page__content'>
         <SearchForm />
         {!topic && <CategoryList />}
-        <CategoryHeader />
-        {status === 'loading' && <Loader />}
-        {status === 'failed' && <div className='error-message'>{error}</div>}
-        <ErrorBoundary>
-          <BookList />
-        </ErrorBoundary>
+
+        {isHomeView ? (
+          <ErrorBoundary>
+            <HomeShelves />
+          </ErrorBoundary>
+        ) : (
+          <>
+            <CategoryHeader />
+            {status === 'loading' && <Loader />}
+            {status === 'failed' && <div className='error-message'>{error}</div>}
+            <ErrorBoundary>
+              <BookList />
+            </ErrorBoundary>
+          </>
+        )}
       </main>
       <ErrorBoundary>
         <BookModal />

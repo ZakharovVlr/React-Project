@@ -9,6 +9,7 @@
 @use 'common.blocks/_books-list';
 @use 'common.blocks/_book-rows';
 @use 'common.blocks/_book-modal';
+@use 'common.blocks/_category-shelf';
 
 * {
     box-sizing: border-box;
@@ -30,8 +31,8 @@
 
 // Светлая тема (включается, когда на <html> стоит атрибут data-theme="light")
 [data-theme='light'] {
-    --color-bg: #e1eec1e0; // Мягкий «бумажный» фон, комфортный для чтения
-    --color-surface: rgb(255, 255, 255); // Белые карточки и строка поиска
+    --color-bg: #ffffffe0; // Мягкий «бумажный» фон, комфортный для чтения
+    --color-surface: rgb(242, 242, 242); // Белые карточки и строка поиска
     --color-text: #1a1a1a; // Глубокий темно-серый текст вместо резкого черного
     --color-text-muted: rgba(26, 26, 26, 0.6);
     --color-border: rgba(0, 0, 0, 0.12);

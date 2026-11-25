@@ -5,6 +5,13 @@ import type { Book, APIResponse } from '../types/api';
 import type { RootState } from './index';
 import type { PayloadAction } from '@reduxjs/toolkit';
 
+export type MainSectionsData = {
+  classics: Book[];
+  thrillers: Book[];
+  loveStories: Book[];
+  cookery: Book[];
+};
+
 export type SearchState = {
   searchQuery: string;
   language: string;
@@ -18,6 +25,9 @@ export type SearchState = {
   nextUrl: string | null;
   isLoadingMore: boolean;
   totalCount: number;
+  mainSections: MainSectionsData | null;
+  mainSectionsStatus: 'idle' | 'loading' | 'succeeded' | 'failed';
+  mainSectionsError: string | null;
 };
 
 const initialState: SearchState = {
@@ -32,6 +42,9 @@ const initialState: SearchState = {
   nextUrl: null,
   isLoadingMore: false,
   totalCount: 0,
+  mainSections: null,
+  mainSectionsStatus: 'idle',
+  mainSectionsError: null,
 };
 
 export const fetchBooks = createAsyncThunk<
@@ -107,37 +120,46 @@ export const fetchMoreBooks = createAsyncThunk<
   }
 });
 
-// 2. ДОБАВЛЯЕМ новый thunk для параллельной загрузки категорий на главную страницу
 export const fetchMainPageSections = createAsyncThunk<
-  { classics: Book[]; thrillers: Book[]; loveStories: Book[] },
+  MainSectionsData,
   void,
   { rejectValue: string }
 >('search/fetchMainPageSections', async (_, thunkAPI) => {
+  const state = thunkAPI.getState() as RootState;
+  if (state.search.mainSections) {
+    return state.search.mainSections;
+  }
+
   try {
     const baseUrl =
       import.meta.env.VITE_GUTENDEX_URL ?? 'https://gutendex-tqvo.onrender.com';
 
-    // Запускаем 3 запроса параллельно, чтобы страница грузилась мгновенно
-    const [classicsRes, thrillersRes, loveStoriesRes] = await Promise.all([
-      fetch(`${baseUrl}/books/?topic=classic`),
-      fetch(`${baseUrl}/books/?topic=thriller`),
-      fetch(`${baseUrl}/books/?topic=love`),
+    const [classicsRes, thrillersRes, loveStoriesRes, cookeryRes] = await Promise.all([
+      fetch(`${baseUrl}/books/?topic=classic`, { signal: thunkAPI.signal }),
+      fetch(`${baseUrl}/books/?topic=horror`, { signal: thunkAPI.signal }),
+      fetch(`${baseUrl}/books/?topic=romance`, { signal: thunkAPI.signal }),
+      fetch(`${baseUrl}/books/?topic=cooking`, { signal: thunkAPI.signal }),
     ]);
 
-    if (!classicsRes.ok || !thrillersRes.ok || !loveStoriesRes.ok) {
+    if (!classicsRes.ok || !thrillersRes.ok || !loveStoriesRes.ok || !cookeryRes.ok) {
       return thunkAPI.rejectWithValue('Не удалось загрузить подборки книг');
     }
 
     const classicsData = (await classicsRes.json()) as APIResponse;
     const thrillersData = (await thrillersRes.json()) as APIResponse;
     const loveStoriesData = (await loveStoriesRes.json()) as APIResponse;
+    const cookeryData = (await cookeryRes.json()) as APIResponse;
 
     return {
       classics: classicsData.results,
       thrillers: thrillersData.results,
       loveStories: loveStoriesData.results,
+      cookery: cookeryData.results,
     };
-  } catch (_error) {
+  } catch (error) {
+    if (error instanceof DOMException && error.name === 'AbortError') {
+      throw error;
+    }
     return thunkAPI.rejectWithValue('Ошибка сети при загрузке подборок');
   }
 });
@@ -206,6 +228,21 @@ export const bookSlice = createSlice({
       })
       .addCase(fetchMoreBooks.rejected, (state) => {
         state.isLoadingMore = false;
+      })
+
+      // Обработка полок на главной странице
+      .addCase(fetchMainPageSections.pending, (state) => {
+        state.mainSectionsStatus = 'loading';
+        state.mainSectionsError = null;
+      })
+      .addCase(fetchMainPageSections.fulfilled, (state, action) => {
+        state.mainSectionsStatus = 'succeeded';
+        state.mainSections = action.payload;
+      })
+      .addCase(fetchMainPageSections.rejected, (state, action) => {
+        if (action.meta.aborted) return;
+        state.mainSectionsStatus = 'failed';
+        state.mainSectionsError = action.payload ?? 'Ошибка загрузки подборок';
       });
   },
 });
