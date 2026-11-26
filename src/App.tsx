@@ -9,6 +9,7 @@ import BookList from './components/BookList';
 import BookModal from './components/BookModal';
 import CategoryHeader from './components/CategoryHeader';
 import CategoryList from './components/CategoryList';
+import EditorialHero from './components/EditorialHero';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import Footer from './components/Footer';
 import Header from './components/Header';
@@ -26,12 +27,13 @@ export default function App(): ReactElement {
   const searchQuery = useAppSelector((state) => state.search.searchQuery);
   const language = useAppSelector((state) => state.search.language);
   const topic = useAppSelector((state) => state.search.topic);
+  const activeCollectionId = useAppSelector((state) => state.search.activeCollectionId);
   const dispatch = useAppDispatch();
 
-  const isHomeView = !searchQuery && !topic;
+  const isHomeView = !searchQuery && !topic && !activeCollectionId;
 
   useEffect(() => {
-    if (isHomeView) return;
+    if (isHomeView || activeCollectionId) return;
 
     const promise = dispatch(fetchBooks());
     return (): void => {
@@ -48,7 +50,10 @@ export default function App(): ReactElement {
 
         {isHomeView ? (
           <ErrorBoundary>
-            <HomeShelves />
+            <>
+              <EditorialHero />
+              <HomeShelves />
+            </>
           </ErrorBoundary>
         ) : (
           <>

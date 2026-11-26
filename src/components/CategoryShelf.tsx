@@ -1,3 +1,4 @@
+//src/components/CategoryShelf.tsx
 import { useEffect, useRef, useState } from 'react';
 
 import { useAppDispatch } from '../hooks/store';
@@ -13,6 +14,17 @@ type CategoryShelfProps = {
   books: Book[];
 };
 
+// вынеси за пределы компонента — чистая функция, хуки ей не нужны
+function getSlotWidth(el: HTMLDivElement): number {
+  const firstItem = el.querySelector<HTMLElement>('.category-shelf__item');
+  if (!firstItem) return el.clientWidth;
+
+  const style = getComputedStyle(el); // это CSSStyleDeclaration — набор всех вычисленных стилей элемента
+  const gap = parseFloat(style.columnGap); // style.columnGap — строка вида "19px", parseFloat превращает её в число 19
+
+  return firstItem.offsetWidth + gap; // ширина карточки (135) + зазор (19) = 154
+}
+
 export default function CategoryShelf({
   title,
   topicKey,
@@ -22,6 +34,7 @@ export default function CategoryShelf({
   const rowRef = useRef<HTMLDivElement | null>(null);
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(true);
+  const [cardsPerView, setCardsPerView] = useState(4);
 
   const checkScroll = (): void => {
     const el = rowRef.current;
@@ -34,12 +47,29 @@ export default function CategoryShelf({
     checkScroll();
     window.addEventListener('resize', checkScroll);
     return (): void => window.removeEventListener('resize', checkScroll);
+  }, [books, cardsPerView]);
+
+  useEffect(() => {
+    const el = rowRef.current;
+    if (!el) return;
+
+    const updateCardsPerView = (): void => {
+      const slotWidth = getSlotWidth(el);
+      setCardsPerView(Math.max(1, Math.floor(el.clientWidth / slotWidth)));
+    };
+
+    updateCardsPerView();
+
+    const observer = new ResizeObserver(updateCardsPerView);
+    observer.observe(el);
+
+    return (): void => observer.disconnect();
   }, [books]);
 
   const handleScroll = (direction: 'left' | 'right'): void => {
     const el = rowRef.current;
     if (!el) return;
-    const scrollAmount = el.clientWidth * 0.75;
+    const scrollAmount = getSlotWidth(el) * cardsPerView;
     el.scrollBy({
       left: direction === 'left' ? -scrollAmount : scrollAmount,
       behavior: 'smooth',
@@ -53,12 +83,14 @@ export default function CategoryShelf({
 
   if (books.length === 0) return null;
 
+  const visibleBooks = books.slice(0, cardsPerView * 3);
+
   return (
     <section className='category-shelf'>
       <h2 className='category-shelf__title'>{title}</h2>
 
       <div className='category-shelf__row' ref={rowRef} onScroll={checkScroll}>
-        {books.map((book) => (
+        {visibleBooks.map((book) => (
           <div key={book.id} className='category-shelf__item'>
             <BookCard book={book} />
           </div>

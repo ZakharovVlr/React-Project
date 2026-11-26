@@ -28,6 +28,9 @@ export type SearchState = {
   mainSections: MainSectionsData | null;
   mainSectionsStatus: 'idle' | 'loading' | 'succeeded' | 'failed';
   mainSectionsError: string | null;
+  heroBooks: Book[];
+  heroBooksStatus: 'idle' | 'loading' | 'succeeded' | 'failed';
+  activeCollectionId: string | null;
 };
 
 const initialState: SearchState = {
@@ -45,6 +48,9 @@ const initialState: SearchState = {
   mainSections: null,
   mainSectionsStatus: 'idle',
   mainSectionsError: null,
+  heroBooks: [],
+  heroBooksStatus: 'idle',
+  activeCollectionId: null,
 };
 
 export const fetchBooks = createAsyncThunk<
@@ -95,6 +101,43 @@ export const fetchBooks = createAsyncThunk<
       throw error;
     }
     return thunkAPI.rejectWithValue('Сбой сети, сервер недоступен');
+  }
+});
+
+export const fetchHeroBooks = createAsyncThunk<
+  Book[],
+  number[], // Принимаем массив ID книг из вашего конфига EDITORIAL_HERO_DATA.bookIds
+  { rejectValue: string }
+>('search/fetchHeroBooks', async (ids, thunkAPI) => {
+  // Защита от повторного запроса, если книги уже есть возвращаем их
+  const state = thunkAPI.getState() as RootState;
+  if (state.search.heroBooks.length > 0) {
+    return state.search.heroBooks;
+  }
+  // Внутри try формируем запрос
+  // передать { signal: thunkAPI.signal } и проверить !response.ok.
+  try {
+    const baseUrl =
+      import.meta.env.VITE_GUTENDEX_URL ?? 'https://gutendex-tqvo.onrender.com';
+    const response = await fetch(`${baseUrl}/books/?ids=${ids.join(',')}`, {
+      signal: thunkAPI.signal,
+    });
+
+    if (!response.ok) {
+      return thunkAPI.rejectWithValue('Не удалось загрузить книги для главного блока');
+    }
+    // Верните data.results (предварительно типизировав ответ как APIResponse).
+    const data = (await response.json()) as APIResponse;
+    const sortedBooks = [...data.results].sort(
+      (a, b) => ids.indexOf(a.id) - ids.indexOf(b.id)
+    );
+    return sortedBooks;
+    // TODO 4: В catch обработайте AbortError так же, как в fetchMainPageSections.
+  } catch (error) {
+    if (error instanceof DOMException && error.name === 'AbortError') {
+      throw error;
+    }
+    return thunkAPI.rejectWithValue('Ошибка сети при загрузке подборок');
   }
 });
 
@@ -181,6 +224,9 @@ export const bookSlice = createSlice({
     setActiveBook: (state, action: PayloadAction<Book | null>) => {
       state.activeBook = action.payload;
     },
+    setActiveCollectionId: (state, action: PayloadAction<string | null>) => {
+      state.activeCollectionId = action.payload;
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -243,11 +289,27 @@ export const bookSlice = createSlice({
         if (action.meta.aborted) return;
         state.mainSectionsStatus = 'failed';
         state.mainSectionsError = action.payload ?? 'Ошибка загрузки подборок';
+      })
+      // Обработка книг для главного редакторского блока
+      .addCase(fetchHeroBooks.pending, (state) => {
+        state.heroBooksStatus = 'loading';
+      })
+      .addCase(fetchHeroBooks.fulfilled, (state, action) => {
+        state.heroBooks = action.payload;
+      })
+      .addCase(fetchHeroBooks.rejected, (state, action) => {
+        if (action.meta.aborted) return;
+        state.heroBooksStatus = 'failed';
       });
   },
 });
 
-export const { setSearchQuery, setLanguage, setTopic, setActiveBook } =
-  bookSlice.actions;
+export const {
+  setSearchQuery,
+  setLanguage,
+  setTopic,
+  setActiveBook,
+  setActiveCollectionId,
+} = bookSlice.actions;
 
 export default bookSlice.reducer;
